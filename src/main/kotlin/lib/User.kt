@@ -5,4 +5,6 @@ interface User {
   val left: Boolean
   val right: Boolean
   val shoot: Boolean
+
+  fun processInputs()
 }

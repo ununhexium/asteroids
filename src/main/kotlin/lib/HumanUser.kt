@@ -5,21 +5,18 @@ import org.openrndr.Program
 
 class HumanUser : User {
 
-  var _up = false
-  var _left = false
-  var _right = false
-  var _shoot = false
+  lateinit var program:Program
 
-  fun decideInputs(program: Program) {
+  private var _up = false
+  private var _left = false
+  private var _right = false
+  private var _shoot = false
+
+  override fun processInputs() {
     program.keyboard.keyDown.listen {
       when (it.key) {
-        'W'.code -> {
-          if (!_up) println("Accelerating")
-          _up = true
-        }
-
+        'W'.code -> _up = true
         'A'.code -> _left = true
-
         'D'.code -> _right = true
       }
 
