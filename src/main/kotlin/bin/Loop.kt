@@ -1,13 +1,14 @@
-import bin.Engine
-import bin.HEIGHT
-import bin.WIDTH
+package bin
+
+import lib.Field
 import lib.HumanUser
 import org.openrndr.application
 
 fun main() = application {
 
+  val field = Field.defaultRandom()
   val user = HumanUser()
-  val engine = Engine(WIDTH.toDouble(), HEIGHT.toDouble(), user)
+  val engine = Engine(WIDTH.toDouble(), HEIGHT.toDouble(), user, field)
 
   configure {
     width = WIDTH
@@ -20,9 +21,6 @@ fun main() = application {
     user.program = this
 
     extend {
-
-      user.processInputs()
-
       if (!engine.finished) {
         engine.step()
         engine.draw(this)

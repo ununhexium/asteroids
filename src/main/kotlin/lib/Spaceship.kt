@@ -77,13 +77,15 @@ data class Spaceship(
     )
   }
 
-  fun updateSight(width: Double, height: Double) {
+  fun updateSight(width: Double, height: Double, asteroids: List<Asteroid>) {
     val target = asteroids
       .flatMap { asteroid ->
-        spaceship.fullSight(width, height)
+        fullSight(width, height)
           .intersections(asteroid.shape(width, height)).map { it to asteroid }
       }
-      .minByOrNull { it.first.distanceTo(Vector2(width / 2.0, height / 2.0)) }
+      .minByOrNull {
+        it.first.distanceTo(Vector2(width / 2.0, height / 2.0))
+      }
 
     inSight = target?.first
     asteroidInSight = target?.second

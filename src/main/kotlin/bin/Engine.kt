@@ -1,12 +1,13 @@
 package bin
 
+import lib.Field
 import lib.User
 import org.openrndr.Program
 import org.openrndr.color.ColorRGBa
 import org.openrndr.math.asDegrees
 import org.openrndr.writer
 
-class Engine(val width: Double, val height: Double, val user: User) {
+class Engine(val width: Double, val height: Double, val user: User, val field: Field) {
 
   private var _finished = false
 
@@ -14,14 +15,14 @@ class Engine(val width: Double, val height: Double, val user: User) {
     get() = _finished
 
   fun step() {
-    processInputs()
+    user.processInputs()
 
     if (!finished) {
-      updateSpaceship(width, height, user)
-      updateAsteroids()
+      field.updateSpaceship(width, height, user)
+      field.updateAsteroids()
     }
 
-    checkWinLose()
+    if (field.asteroids.isEmpty()) _finished = true
   }
 
   fun draw(program: Program) {
@@ -29,9 +30,9 @@ class Engine(val width: Double, val height: Double, val user: User) {
       newLine()
       text("Here is a line of text..")
       newLine()
-      text(asteroids.firstOrNull()?.position?.toString() ?: "No asteroid")
+      text(field.asteroids.firstOrNull()?.position?.toString() ?: "No asteroid")
       newLine()
-      text(asteroids.size.toString())
+      text(field.asteroids.size.toString())
     }
 
     program.drawAsteroids()
@@ -40,26 +41,18 @@ class Engine(val width: Double, val height: Double, val user: User) {
     program.drawSpaceship(user)
 
     if (_finished) {
-      if (asteroids.isEmpty())
+      if (field.asteroids.isEmpty())
         program.writer {
           program.drawer.text("WIN", width / 2.0, height / 2.0)
         }
     }
   }
 
-  private fun checkWinLose() {
-    if (asteroids.isEmpty()) _finished = true
-  }
-
-  private fun processInputs() {
-    user.processInputs()
-  }
-
 
   private fun Program.drawAsteroids() {
     drawer.fill = ColorRGBa.GRAY
     drawer.circles(
-      asteroids.map {
+      field.asteroids.map {
         it.shape(
           width.toDouble(),
           height.toDouble(),
@@ -69,27 +62,27 @@ class Engine(val width: Double, val height: Double, val user: User) {
 
     drawer.stroke = ColorRGBa.WHITE
     drawer.fill = ColorRGBa.TRANSPARENT
-    spaceship.asteroidInSight?.let {
+    field.spaceship.asteroidInSight?.let {
       drawer.circle(it.shape(width.toDouble(), height.toDouble()))
     }
   }
 
   private fun Program.drawSight(width: Double, height: Double) {
-    val shoot = spaceship.shotAsteroid != null
-    val target = spaceship.inSight != null
+    val shoot = field.spaceship.shotAsteroid != null
+    val target = field.spaceship.inSight != null
     drawer.stroke =
       when {
         shoot -> ColorRGBa.RED
-        target -> ColorRGBa.YELLOW.mix(ColorRGBa.RED, spaceship.gun.heatRatio)
-        else -> ColorRGBa.GREEN.mix(ColorRGBa.BLUE, spaceship.gun.heatRatio)
+        target -> ColorRGBa.YELLOW.mix(ColorRGBa.RED, field.spaceship.gun.heatRatio)
+        else -> ColorRGBa.GREEN.mix(ColorRGBa.BLUE, field.spaceship.gun.heatRatio)
       }
 
 
-    drawer.lineSegment(spaceship.sightShape(width, height))
+    drawer.lineSegment(field.spaceship.sightShape(width, height))
   }
 
   private fun Program.drawContactPoint() {
-    spaceship.inSight?.let {
+    field.spaceship.inSight?.let {
       drawer.pushTransforms()
       drawer.stroke = ColorRGBa.YELLOW
       drawer.translate(it)
@@ -99,15 +92,15 @@ class Engine(val width: Double, val height: Double, val user: User) {
 
   }
 
-  fun Program.drawSpaceship(user: User) {
+  private fun Program.drawSpaceship(user: User) {
     drawer.stroke = ColorRGBa.TRANSPARENT
 
     if (user.up) drawer.fill = ColorRGBa.GREEN
     else drawer.fill = ColorRGBa.YELLOW
 
     drawer.translate(width * 0.5, height * 0.5)
-    drawer.rotate(spaceship.angleRad.asDegrees)
-    drawer.shape(spaceship.shape.shape)
+    drawer.rotate(field.spaceship.angleRad.asDegrees)
+    drawer.shape(field.spaceship.shape.shape)
   }
 
 }
