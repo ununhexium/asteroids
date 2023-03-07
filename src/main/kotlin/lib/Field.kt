@@ -1,35 +1,74 @@
 package lib
 
 import bin.*
-import org.openrndr.extra.noise.random
 import org.openrndr.math.Vector2
+import kotlin.random.Random
 
 class Field(
+  // TODO move the dimensions here
   val asteroids: MutableList<Asteroid>,
   val spaceship: Spaceship
 ) {
   companion object {
-    fun defaultRandom() =
-      Field(
+    fun defaultRandom(): Field {
+      val rand = { min: Double, max: Double -> Random.nextDouble(min, max) }
+
+      return Field(
         (1..ASTEROIDS).map {
-          val averageSpeed = (MIN_ASTEROID_SPEED + MAX_ASTEROID_SPEED) / 2
           Asteroid(
             Vector2(
-              random(0.0, WIDTH.toDouble()),
-              random(0.0, HEIGHT.toDouble())
+              rand(0.0, WIDTH.toDouble()),
+              rand(0.0, HEIGHT.toDouble())
             ),
-            random(
+            rand(
               MIN_ASTEROID_SIZE.toDouble(),
               MAX_ASTEROID_SIZE.toDouble()
             ).toInt(),
             Vector2(
-              random(MIN_ASTEROID_SPEED, MAX_ASTEROID_SPEED) - averageSpeed,
-              random(MIN_ASTEROID_SPEED, MAX_ASTEROID_SPEED) - averageSpeed,
+              rand(
+                MIN_ASTEROID_SPEED,
+                MAX_ASTEROID_SPEED
+              ) - AVERAGE_ASTEROID_SPEED,
+              rand(
+                MIN_ASTEROID_SPEED,
+                MAX_ASTEROID_SPEED
+              ) - AVERAGE_ASTEROID_SPEED,
             )
           )
         }.toMutableList(),
         Spaceship(Vector2.ZERO, 0.0)
       )
+    }
+
+    fun constant(random: Random): Field {
+      val rand = { min: Double, max: Double -> random.nextDouble(min, max) }
+
+      return Field(
+        (1..ASTEROIDS).map {
+          Asteroid(
+            Vector2(
+              rand(0.0, WIDTH.toDouble()),
+              rand(0.0, HEIGHT.toDouble())
+            ),
+            rand(
+              MIN_ASTEROID_SIZE.toDouble(),
+              MAX_ASTEROID_SIZE.toDouble()
+            ).toInt(),
+            Vector2(
+              rand(
+                MIN_ASTEROID_SPEED,
+                MAX_ASTEROID_SPEED
+              ) - AVERAGE_ASTEROID_SPEED,
+              rand(
+                MIN_ASTEROID_SPEED,
+                MAX_ASTEROID_SPEED
+              ) - AVERAGE_ASTEROID_SPEED,
+            )
+          )
+        }.toMutableList(),
+        Spaceship(Vector2.ZERO, 0.0)
+      )
+    }
   }
 
   fun update(width: Double, height: Double, user: User) {
@@ -64,5 +103,14 @@ class Field(
     asteroids.forEach {
       it.updatePosition(spaceship)
     }
+  }
+
+  fun asteroidsWeightInLaserShots() =
+    asteroids.sumOf { Asteroid.shotsToDestroy(it) }
+
+  fun contact(): Boolean {
+    val center = Vector2(WIDTH / 2.0, HEIGHT / 2.0)
+
+    return asteroids.any { it.position.distanceTo(center) < it.displaySize }
   }
 }

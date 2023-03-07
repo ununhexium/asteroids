@@ -1,6 +1,6 @@
 package lib
 
-class NoRenderer : Renderer {
+object NoRenderer : Renderer {
   override fun draw() {
     // noop
   }

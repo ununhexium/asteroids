@@ -1,5 +1,7 @@
 package bin
 
+// TODO encapsulate
+
 const val ASTEROIDS = 10
 
 const val WIDTH = 1920
@@ -18,3 +20,5 @@ const val MAX_ASTEROID_SIZE = 5
 const val ASTEROID_SPLIT_COUNT = 3
 const val SHIP_SIZE = 10.0
 const val START_ANGLE = 0.0
+
+const val SHOW_AFTER_DEATH = 1.0

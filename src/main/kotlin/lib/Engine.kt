@@ -1,35 +1,37 @@
 package lib
 
-class Engine(
+import java.time.Duration
+
+class Engine<U : User>(
   val width: Double,
   val height: Double,
-  val user: User,
+  val user: U,
   val field: Field,
   val renderer: Renderer,
-  private val name: String =
-    "E${(index++).toString().padStart(2, '0')}",
+  val maxTicks: Int,
 ) {
-  companion object {
-    private var index = 0
-  }
 
-  var timeout = false
+  var timedOut = false
+    private set
+
+  var lost = false
     private set
 
   val finished
-    get() = timeout || field.asteroids.isEmpty()
+    get() = lost || timedOut || field.asteroids.isEmpty()
 
-  fun runUpTo(steps: Int) {
+  fun fullRun() {
     var step = 0
-    while (!finished && step++ < steps) {
+    while (!finished && step++ < maxTicks) {
       step()
     }
-    timeout = true
+    timedOut = true
   }
 
   fun step() {
     user.processInputs()
     if (!finished) field.update(width, height, user)
+    if (field.contact()) lost = true
     renderer.draw()
   }
 }
