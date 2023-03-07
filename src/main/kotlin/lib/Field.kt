@@ -32,13 +32,18 @@ class Field(
       )
   }
 
-  fun updateSpaceship(width: Double, height: Double, user:User) {
+  fun update(width: Double, height: Double, user: User) {
+    updateSpaceship(width, height, user)
+    updateAsteroids()
+  }
+
+  fun updateSpaceship(width: Double, height: Double, user: User) {
     spaceship.updateAzimut(left = user.left, right = user.right)
     spaceship.updateSpeed(accelerate = user.up)
     spaceship.updateSight(width, height, asteroids)
     spaceship.gun.tick()
 
-    if(!spaceship.gun.canShoot()) {
+    if (!spaceship.gun.canShoot()) {
       spaceship.shotAsteroid = null
     }
 
