@@ -1,4 +1,6 @@
 import bin.*
+import lib.HumanUser
+import lib.User
 import org.openrndr.Program
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
@@ -7,9 +9,13 @@ import org.openrndr.writer
 
 fun main() = application {
 
+  val user = HumanUser()
+  val engine = Engine(WIDTH.toDouble(), HEIGHT.toDouble(), user)
+
   configure {
     width = WIDTH
     height = HEIGHT
+    windowResizable = false
   }
 
   program {
@@ -28,17 +34,17 @@ fun main() = application {
       val w = width.toDouble()
       val h = height.toDouble()
 
-      processInputs()
+      user.decideInputs(this)
 
       if (!finished) {
-        updateSpaceship(w, h)
+        updateSpaceship(w, h, user)
         updateAsteroids()
       }
 
       drawAsteroids()
       drawSight(w, h)
       drawContactPoint()
-      drawSpaceship()
+      drawSpaceship(user)
 
       checkWinLose()
 
@@ -55,7 +61,6 @@ fun main() = application {
 fun checkWinLose() {
   if (asteroids.isEmpty()) finished = true
 }
-
 
 private fun Program.drawAsteroids() {
   drawer.fill = ColorRGBa.GRAY
@@ -100,10 +105,10 @@ private fun Program.drawContactPoint() {
 
 }
 
-fun Program.drawSpaceship() {
+fun Program.drawSpaceship(user: User) {
   drawer.stroke = ColorRGBa.TRANSPARENT
 
-  if (up) drawer.fill = ColorRGBa.GREEN
+  if (user.up) drawer.fill = ColorRGBa.GREEN
   else drawer.fill = ColorRGBa.YELLOW
 
   drawer.translate(width * 0.5, height * 0.5)

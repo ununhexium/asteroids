@@ -1,8 +1,10 @@
 package bin
 
-fun updateSpaceship(width: Double, height: Double) {
-  spaceship.updateAzimut(left = left, right = right)
-  spaceship.updateSpeed(accelerate = up)
+import lib.User
+
+fun updateSpaceship(width: Double, height: Double, user:User) {
+  spaceship.updateAzimut(left = user.left, right = user.right)
+  spaceship.updateSpeed(accelerate = user.up)
   spaceship.updateSight(width, height)
   spaceship.gun.tick()
 
@@ -10,7 +12,7 @@ fun updateSpaceship(width: Double, height: Double) {
     spaceship.shotAsteroid = null
   }
 
-  if (shoot && spaceship.gun.canShoot()) {
+  if (user.shoot && spaceship.gun.canShoot()) {
     spaceship.gun.shoot()
     spaceship.shotAsteroid = spaceship.asteroidInSight
   }
