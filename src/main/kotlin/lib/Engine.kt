@@ -1,7 +1,6 @@
-package bin
+package lib
 
-import lib.Field
-import lib.User
+import bin.contactPointShape
 import org.openrndr.Program
 import org.openrndr.color.ColorRGBa
 import org.openrndr.math.asDegrees
