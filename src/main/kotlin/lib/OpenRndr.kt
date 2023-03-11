@@ -3,6 +3,7 @@ package lib
 import bin.contactPointShape
 import org.openrndr.Program
 import org.openrndr.color.ColorRGBa
+import org.openrndr.extra.color.presets.ORANGE
 import org.openrndr.math.asDegrees
 import org.openrndr.writer
 
@@ -46,6 +47,11 @@ class OpenRndr(
           height.toDouble(),
         )
       }
+    )
+
+    drawer.fill = ColorRGBa.ORANGE
+    drawer.circle(
+      field.getNearestAsteroid().shape(width.toDouble(), height.toDouble())
     )
 
     drawer.stroke = ColorRGBa.WHITE

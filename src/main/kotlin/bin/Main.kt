@@ -5,15 +5,16 @@ import lib.Engine
 import lib.Field
 import lib.HumanUser
 import lib.OpenRndr
+import java.time.Duration
 import kotlin.random.Random
 
 fun main() {
 
   val seed = 116L
-  val genetic = Genetic(100, seed)
+  val genetic = Genetic(96, seed)
 
-//  val user = genetic.process(Duration.ofSeconds(5))
-  val user = HumanUser()
+  val user = genetic.process(Duration.ofSeconds(5))
+//  val user = HumanUser()
 
   val field = Field.constant(Random(seed))
   val renderer = OpenRndr(field, user, WIDTH.toDouble(), HEIGHT.toDouble())
@@ -27,8 +28,17 @@ fun main() {
       Int.MAX_VALUE
     )
 
-  var lastFrame = 0.0
 
-  play(user, renderer, engine, lastFrame)
+  play(
+    user,
+    renderer,
+    Engine(
+      WIDTH.toDouble(),
+      HEIGHT.toDouble(),
+      user,
+      field,
+      renderer,
+    ),
+  )
 }
 

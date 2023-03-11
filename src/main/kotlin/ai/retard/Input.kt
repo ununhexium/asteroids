@@ -17,18 +17,29 @@ data class Input(
       .toString()
 
   companion object {
-    fun random(): Input {
-      val turn = Random.nextBoolean()
-      val left = Random.nextBoolean()
-      val accelerate = Random.nextBoolean()
-      val shoot = Random.nextBoolean()
 
-      return Input(
-        turn && left,
-        turn && !left,
-        accelerate,
-        shoot,
-      )
+    val inputs = listOf(true, false).flatMap { accel ->
+      listOf(-1, 0, 1).flatMap { direction ->
+        listOf(true, false).map { shoot ->
+          Input(
+            accel,
+            when (direction) {
+              -1 -> true
+              1 -> false
+              else -> false
+            },
+            when (direction) {
+              -1 -> false
+              1 -> true
+              else -> false
+            },
+            shoot
+          )
+        }
+      }
     }
+
+    fun random() = inputs[Random.nextInt(inputs.size)]
+    fun fixed() = Input(true, false, false, false)
   }
 }

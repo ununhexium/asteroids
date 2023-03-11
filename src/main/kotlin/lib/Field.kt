@@ -9,6 +9,7 @@ class Field(
   val asteroids: MutableList<Asteroid>,
   val spaceship: Spaceship
 ) {
+
   companion object {
     fun defaultRandom(): Field {
       val rand = { min: Double, max: Double -> Random.nextDouble(min, max) }
@@ -110,7 +111,11 @@ class Field(
 
   fun contact(): Boolean {
     val center = Vector2(WIDTH / 2.0, HEIGHT / 2.0)
+    return asteroids.any { it.shape(WIDTH.toDouble(), HEIGHT.toDouble()).contains(center) }
+  }
 
-    return asteroids.any { it.position.distanceTo(center) < it.displaySize }
+  fun getNearestAsteroid(): Asteroid {
+    val center = Vector2(WIDTH / 2.0, HEIGHT / 2.0)
+    return asteroids.minBy { it.getDisplayPosition(WIDTH.toDouble(), HEIGHT.toDouble()).distanceTo(center) }
   }
 }

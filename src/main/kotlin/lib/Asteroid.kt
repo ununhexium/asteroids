@@ -40,14 +40,16 @@ data class Asteroid(
 
   val position
     get() = _position
-
+  
   fun shape(
     maxX: Double,
     maxY: Double,
   ): Circle {
-    val displayPos = Vector2(_position.x.mod(maxX), _position.y.mod(maxY))
-    return Circle(displayPos, displaySize)
+    return Circle(getDisplayPosition(maxX, maxY), displaySize)
   }
+
+  fun getDisplayPosition(maxX: Double, maxY: Double) =
+    Vector2(_position.x.mod(maxX), _position.y.mod(maxY))
 
   fun updatePosition(spaceship: Spaceship) {
     _position = _position + speed - spaceship.speed

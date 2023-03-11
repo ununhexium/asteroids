@@ -1,9 +1,12 @@
 package ai.retard
 
-import lib.User
-import lib.World
+import bin.HEIGHT
+import bin.WIDTH
+import bin.play
+import lib.*
 import java.time.Duration
 import java.time.Instant
+import kotlin.random.Random
 
 
 /**
@@ -25,23 +28,24 @@ class Genetic(val size: Int, val seed: Long) {
       iteration++
 
       val worlds = population.map { gene ->
-        World.make(seed, gene, 300)
+        World.make(seed, gene, 600)
       }
+      val refField = Field.constant(Random(seed))
 
       worlds.parallelStream().forEach {
         it.engine.fullRun()
       }
 
+      val maxShots = refField.asteroidsWeightInLaserShots()
       val ordered = worlds
-        .sortedByDescending { it.user.tick }
-        .sortedBy { it.field.asteroidsWeightInLaserShots() }
+        .sortedByDescending { it.user.inputs.size }
 
       population = generateNextGeneration(ordered.map { it.user })
 
-      val remaining = ordered.first().field.asteroidsWeightInLaserShots()
-      val textActions = population.first().textActions()
+      val best = ordered.first()
+      val remaining = best.field.asteroidsWeightInLaserShots()
 
-      println("Best for $iteration: $remaining - $textActions")
+      println("Best for $iteration: $remaining - ${best.user.inputs.size}")
 
       val inTime = Duration.between(start, Instant.now()) < timeLimit
     } while (inTime)
@@ -50,8 +54,8 @@ class Genetic(val size: Int, val seed: Long) {
   }
 
   private fun generateNextGeneration(ordered: List<Gene>): List<Gene> {
-    val keep = ordered.takeLast(size / 2)
-    val new = keep.map { it.copy(inputs = it.inputs + Input.random()) }
+    val keep = ordered.take(size / 2)
+    val new = keep.map { it.copy(inputs = it.inputs + Input.fixed()) }
 
     return keep + new
   }
