@@ -1,5 +1,6 @@
 package bin
 
+import ai.retard.Gene
 import ai.retard.Genetic
 import lib.Engine
 import lib.Field
@@ -13,7 +14,7 @@ fun main() {
   val seed = 116L
   val genetic = Genetic(96, seed)
 
-  val user = genetic.process(Duration.ofSeconds(5))
+  val user = genetic.process(Duration.ofSeconds(50))
 //  val user = HumanUser()
 
   val field = Field.constant(Random(seed))
@@ -25,20 +26,13 @@ fun main() {
       user,
       field,
       renderer,
-      Int.MAX_VALUE
+      if(user is HumanUser) Int.MAX_VALUE else (user as Gene).inputs.size
     )
-
 
   play(
     user,
     renderer,
-    Engine(
-      WIDTH.toDouble(),
-      HEIGHT.toDouble(),
-      user,
-      field,
-      renderer,
-    ),
+    engine
   )
 }
 

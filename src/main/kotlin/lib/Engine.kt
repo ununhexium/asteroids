@@ -8,7 +8,8 @@ class Engine<U : User>(
   val user: U,
   val field: Field,
   val renderer: Renderer,
-  val maxTicks: Int = Int.MAX_VALUE,
+  val maxTicks: Int,
+  val debug: Boolean = false
 ) {
 
   var timedOut = false
@@ -30,6 +31,7 @@ class Engine<U : User>(
   }
 
   fun step() {
+    if(debug) println("Step $step")
     step++
     if (lost) throw IllegalStateException()
     user.processInputs()

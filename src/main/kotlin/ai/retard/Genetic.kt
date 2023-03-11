@@ -1,8 +1,5 @@
 package ai.retard
 
-import bin.HEIGHT
-import bin.WIDTH
-import bin.play
 import lib.*
 import java.time.Duration
 import java.time.Instant
@@ -28,7 +25,7 @@ class Genetic(val size: Int, val seed: Long) {
       iteration++
 
       val worlds = population.map { gene ->
-        World.make(seed, gene, 600)
+        World.make(seed, gene, population.maxOf { it.inputs.size })
       }
       val refField = Field.constant(Random(seed))
 
@@ -36,11 +33,11 @@ class Genetic(val size: Int, val seed: Long) {
         it.engine.fullRun()
       }
 
-      val maxShots = refField.asteroidsWeightInLaserShots()
       val ordered = worlds
-        .sortedByDescending { it.user.inputs.size }
+        .filterNot { it.engine.lost }
+        .sortedBy { it.field.asteroidsWeightInLaserShots() }
 
-      population = generateNextGeneration(ordered.map { it.user })
+      population = generateNextGeneration(ordered.map { it.user }, size)
 
       val best = ordered.first()
       val remaining = best.field.asteroidsWeightInLaserShots()
@@ -50,14 +47,25 @@ class Genetic(val size: Int, val seed: Long) {
       val inTime = Duration.between(start, Instant.now()) < timeLimit
     } while (inTime)
 
+    println("Diversity: ${population.groupBy { it.inputs }.size}")
+
     return population.first()
   }
 
-  private fun generateNextGeneration(ordered: List<Gene>): List<Gene> {
-    val keep = ordered.take(size / 2)
-    val new = keep.map { it.copy(inputs = it.inputs + Input.fixed()) }
+  private fun generateNextGeneration(
+    ordered: List<Gene>,
+    targetSize: Int
+  ): List<Gene> {
+    val eliminated = targetSize - ordered.size
 
-    return keep + new
+    val nextStep = ordered.map { it.copy(inputs = it.inputs + Input.random()) }
+
+    val new = (1..eliminated).map {
+      val k = ordered.random()
+      k.copy(inputs = k.inputs + Input.random())
+    }
+
+    return nextStep + new
   }
 
 }

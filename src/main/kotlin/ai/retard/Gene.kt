@@ -4,13 +4,13 @@ import lib.User
 
 data class Gene(val inputs: List<Input>) : User {
   override val up: Boolean
-    get() = inputs[tick % inputs.size].up
+    get() = inputs[tick].up
   override val left: Boolean
-    get() = inputs[tick % inputs.size].left
+    get() = inputs[tick].left
   override val right: Boolean
-    get() = inputs[tick % inputs.size].right
+    get() = inputs[tick].right
   override val shoot: Boolean
-    get() = inputs[tick % inputs.size].shoot
+    get() = inputs[tick].shoot
 
   var tick = 0
     private set

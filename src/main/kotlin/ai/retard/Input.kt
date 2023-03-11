@@ -40,6 +40,5 @@ data class Input(
     }
 
     fun random() = inputs[Random.nextInt(inputs.size)]
-    fun fixed() = Input(true, false, false, false)
   }
 }
